@@ -27,7 +27,7 @@ var log = logging.Logger("publisher")
 type Publisher interface {
 	// Publish creates, signs and publishes an advert. It then announces the new
 	// advert to other indexers.
-	Publish(ctx context.Context, provider *peer.AddrInfo, contextID string, digests []mh.Multihash, meta metadata.Metadata) (ipld.Link, error)
+	Publish(ctx context.Context, provider peer.AddrInfo, contextID string, digests []mh.Multihash, meta metadata.Metadata) (ipld.Link, error)
 }
 
 type IPNIPublisher struct {
@@ -37,13 +37,15 @@ type IPNIPublisher struct {
 	store  store.PublisherStore
 }
 
-func (p *IPNIPublisher) Publish(ctx context.Context, providerInfo *peer.AddrInfo, contextID string, digests []mh.Multihash, meta metadata.Metadata) (ipld.Link, error) {
+func (p *IPNIPublisher) Publish(ctx context.Context, providerInfo peer.AddrInfo, contextID string, digests []mh.Multihash, meta metadata.Metadata) (ipld.Link, error) {
 	link, err := p.publishAdvForIndex(ctx, providerInfo.ID, providerInfo.Addrs, []byte(contextID), meta, false, slices.Values(digests))
 	if err != nil {
 		return nil, fmt.Errorf("publishing IPNI advert: %w", err)
 	}
 	return link, nil
 }
+
+var _ Publisher = (*IPNIPublisher)(nil)
 
 func New(id crypto.PrivKey, store store.PublisherStore, opts ...Option) (*IPNIPublisher, error) {
 	o := &options{
