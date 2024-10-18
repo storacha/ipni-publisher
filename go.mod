@@ -13,7 +13,7 @@ require (
 	github.com/libp2p/go-libp2p v0.36.5
 	github.com/multiformats/go-multiaddr v0.13.0
 	github.com/multiformats/go-multihash v0.2.3
-	github.com/storacha/go-ucanto v0.1.1-0.20241013210933-3949fc84d5ab
+	github.com/storacha/go-ucanto v0.1.1-0.20241018055500-0909684492ae
 	github.com/stretchr/testify v1.9.0
 )
 
