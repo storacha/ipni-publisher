@@ -392,7 +392,7 @@ func providerContextKey(provider peer.ID, contextID []byte) datastore.Key {
 }
 
 type dsProviderContextTable struct {
-	ds datastore.Batching
+	ds datastore.Datastore
 }
 
 func (d *dsProviderContextTable) Delete(ctx context.Context, p peer.ID, contextID []byte) error {
@@ -410,7 +410,7 @@ func (d *dsProviderContextTable) Put(ctx context.Context, p peer.ID, contextID [
 var _ ProviderContextTable = (*dsProviderContextTable)(nil)
 
 type dsStoreAdapter struct {
-	ds datastore.Batching
+	ds datastore.Datastore
 }
 
 // Get implements Store.
@@ -471,11 +471,11 @@ func asCID(link ipld.Link) cid.Cid {
 	return cid.MustParse(link.String())
 }
 
-func SimpleStoreFromDatastore(ds datastore.Batching) Store {
+func SimpleStoreFromDatastore(ds datastore.Datastore) Store {
 	return &dsStoreAdapter{ds}
 }
 
-func FromDatastore(ds datastore.Batching) FullStore {
+func FromDatastore(ds datastore.Datastore) FullStore {
 	return NewPublisherStore(
 		&dsStoreAdapter{ds},
 		&dsProviderContextTable{namespace.Wrap(ds, datastore.NewKey(keyToChunkLinkMapPrefix))},
@@ -483,7 +483,7 @@ func FromDatastore(ds datastore.Batching) FullStore {
 	)
 }
 
-func FromLocalStore(storagePath string, ds datastore.Batching) FullStore {
+func FromLocalStore(storagePath string, ds datastore.Datastore) FullStore {
 	store := &directoryStore{storagePath}
 	chunkLinksStore := &dsProviderContextTable{namespace.Wrap(ds, datastore.NewKey(keyToChunkLinkMapPrefix))}
 	mdStore := &dsProviderContextTable{namespace.Wrap(ds, datastore.NewKey(keyToMetadataMapPrefix))}
