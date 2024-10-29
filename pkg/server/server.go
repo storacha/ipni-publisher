@@ -53,7 +53,7 @@ func NewServer(store store.EncodeableStore, options ...Option) (*Server, error) 
 	s := &Server{advertStore: store, srv: srv, handlerPath: handlerPath}
 
 	mux := http.NewServeMux()
-	mux.Handle(handlerPath+"/{ad}", s)
+	mux.Handle("/"+handlerPath+"/{ad}", s)
 	s.srv.Handler = mux
 
 	return s, nil
