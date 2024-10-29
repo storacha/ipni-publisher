@@ -3,6 +3,7 @@ package publisher
 import (
 	"context"
 	"math/rand/v2"
+	"slices"
 	"sort"
 	"testing"
 
@@ -37,7 +38,7 @@ func TestPublish(t *testing.T) {
 		require.NoError(t, err)
 
 		digests := testutil.RandomMultihashes(rand.IntN(10) + 1)
-		adlnk, err := publisher.Publish(ctx, provInfo, testutil.RandomCID().String(), digests, metadata.Default.New())
+		adlnk, err := publisher.Publish(ctx, provInfo, testutil.RandomCID().String(), slices.Values(digests), metadata.Default.New())
 		require.NoError(t, err)
 
 		ad, err := st.Advert(ctx, adlnk)
@@ -59,7 +60,7 @@ func TestPublish(t *testing.T) {
 		require.NoError(t, err)
 
 		digests := testutil.RandomMultihashes(store.MaxEntryChunkSize + 1)
-		adlnk, err := publisher.Publish(ctx, provInfo, testutil.RandomCID().String(), digests, metadata.Default.New())
+		adlnk, err := publisher.Publish(ctx, provInfo, testutil.RandomCID().String(), slices.Values(digests), metadata.Default.New())
 		require.NoError(t, err)
 
 		ad, err := st.Advert(ctx, adlnk)
@@ -95,7 +96,7 @@ func TestPublish(t *testing.T) {
 			ctxid := testutil.RandomCID().String()
 			digests := testutil.RandomMultihashes(1 + rand.IntN(100))
 
-			l, err := publisher.Publish(ctx, provInfo, ctxid, digests, metadata.Default.New())
+			l, err := publisher.Publish(ctx, provInfo, ctxid, slices.Values(digests), metadata.Default.New())
 			require.NoError(t, err)
 
 			adLinks = append(adLinks, l)
