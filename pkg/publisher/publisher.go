@@ -81,7 +81,7 @@ func (p *IPNIPublisher) publishAdvForIndex(ctx context.Context, peer peer.ID, ad
 	chunkLink, err := p.store.ChunkLinkForProviderAndContextID(ctx, peer, contextID)
 	if err != nil {
 		if !store.IsNotFound(err) {
-			return nil, fmt.Errorf("cound not not get entries cid by provider + context id: %s", err)
+			return nil, fmt.Errorf("could not get entries cid by provider + context id: %s", err)
 		}
 	}
 
