@@ -8,12 +8,14 @@ require (
 	github.com/ipfs/go-cid v0.4.1
 	github.com/ipfs/go-datastore v0.6.0
 	github.com/ipfs/go-log/v2 v2.5.1
-	github.com/ipld/go-ipld-prime v0.21.0
+	github.com/ipld/go-ipld-prime v0.21.1-0.20240917223228-6148356a4c2e
 	github.com/ipni/go-libipni v0.6.13
 	github.com/libp2p/go-libp2p v0.36.5
 	github.com/multiformats/go-multiaddr v0.13.0
+	github.com/multiformats/go-multicodec v0.9.0
 	github.com/multiformats/go-multihash v0.2.3
-	github.com/storacha/go-ucanto v0.1.1-0.20241018055500-0909684492ae
+	github.com/multiformats/go-varint v0.0.7
+	github.com/storacha/go-ucanto v0.1.1-0.20241028163940-34de8cd912bb
 	github.com/stretchr/testify v1.9.0
 )
 
@@ -37,12 +39,10 @@ require (
 	github.com/multiformats/go-base36 v0.2.0 // indirect
 	github.com/multiformats/go-multiaddr-fmt v0.1.0 // indirect
 	github.com/multiformats/go-multibase v0.2.0 // indirect
-	github.com/multiformats/go-multicodec v0.9.0 // indirect
 	github.com/multiformats/go-multistream v0.5.0 // indirect
-	github.com/multiformats/go-varint v0.0.7 // indirect
 	github.com/pion/ice/v2 v2.3.35 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/polydawn/refmt v0.89.0 // indirect
+	github.com/polydawn/refmt v0.89.1-0.20231129105047-37766d95467a // indirect
 	github.com/quic-go/qpack v0.5.1 // indirect
 	github.com/spaolacci/murmur3 v1.1.0 // indirect
 	github.com/whyrusleeping/cbor-gen v0.1.2 // indirect
