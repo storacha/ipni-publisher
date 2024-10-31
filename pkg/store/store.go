@@ -133,9 +133,10 @@ type FullStore interface {
 }
 
 type AdStore struct {
-	store      Store
-	chunkLinks ProviderContextTable
-	metadata   ProviderContextTable
+	store           Store
+	chunkLinks      ProviderContextTable
+	metadata        ProviderContextTable
+	metadataContext metadata.MetadataContext
 }
 
 var _ FullStore = (*AdStore)(nil)
@@ -185,7 +186,7 @@ func (s *AdStore) EncodeHead(ctx context.Context, w io.Writer) error {
 }
 
 func (s *AdStore) MetadataForProviderAndContextID(ctx context.Context, p peer.ID, contextID []byte) (metadata.Metadata, error) {
-	return Metadata(ctx, s.metadata, p, contextID)
+	return Metadata(ctx, s.metadataContext, s.metadata, p, contextID)
 }
 
 func (s *AdStore) PutMetadataForProviderAndContextID(ctx context.Context, p peer.ID, contextID []byte, md metadata.Metadata) error {
@@ -196,8 +197,16 @@ func (s *AdStore) DeleteMetadataForProviderAndContextID(ctx context.Context, p p
 	return s.metadata.Delete(ctx, p, contextID)
 }
 
-func NewPublisherStore(store Store, chunkLinks, metadata ProviderContextTable) *AdStore {
-	return &AdStore{store, chunkLinks, metadata}
+func NewPublisherStore(store Store, chunkLinks, metadataTable ProviderContextTable, opts ...Option) *AdStore {
+	o := &options{}
+	for _, opt := range opts {
+		opt(o)
+	}
+	mctx := o.metadataContext
+	if mctx == nil {
+		mctx = metadata.Default
+	}
+	return &AdStore{store, chunkLinks, metadataTable, mctx}
 }
 
 func Advert(ctx context.Context, ds Store, id ipld.Link) (schema.Advertisement, error) {
@@ -339,8 +348,8 @@ func PutChunkLink(ctx context.Context, ds ProviderContextTable, p peer.ID, conte
 	return ds.Put(ctx, p, contextID, []byte(lnk.Binary()))
 }
 
-func Metadata(ctx context.Context, ds ProviderContextTable, p peer.ID, contextID []byte) (metadata.Metadata, error) {
-	md := metadata.Default.New()
+func Metadata(ctx context.Context, mctx metadata.MetadataContext, ds ProviderContextTable, p peer.ID, contextID []byte) (metadata.Metadata, error) {
+	md := mctx.New()
 	data, err := ds.Get(ctx, p, contextID)
 	if err != nil {
 		return md, err
@@ -475,17 +484,18 @@ func SimpleStoreFromDatastore(ds datastore.Datastore) Store {
 	return &dsStoreAdapter{ds}
 }
 
-func FromDatastore(ds datastore.Datastore) FullStore {
+func FromDatastore(ds datastore.Datastore, opts ...Option) FullStore {
 	return NewPublisherStore(
 		&dsStoreAdapter{ds},
 		&dsProviderContextTable{namespace.Wrap(ds, datastore.NewKey(keyToChunkLinkMapPrefix))},
 		&dsProviderContextTable{namespace.Wrap(ds, datastore.NewKey(keyToMetadataMapPrefix))},
+		opts...,
 	)
 }
 
-func FromLocalStore(storagePath string, ds datastore.Datastore) FullStore {
+func FromLocalStore(storagePath string, ds datastore.Datastore, opts ...Option) FullStore {
 	store := &directoryStore{storagePath}
 	chunkLinksStore := &dsProviderContextTable{namespace.Wrap(ds, datastore.NewKey(keyToChunkLinkMapPrefix))}
 	mdStore := &dsProviderContextTable{namespace.Wrap(ds, datastore.NewKey(keyToMetadataMapPrefix))}
-	return NewPublisherStore(store, chunkLinksStore, mdStore)
+	return NewPublisherStore(store, chunkLinksStore, mdStore, opts...)
 }
