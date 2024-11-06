@@ -46,6 +46,11 @@ func (p *IPNIPublisher) Publish(ctx context.Context, providerInfo peer.AddrInfo,
 
 var _ Publisher = (*IPNIPublisher)(nil)
 
+// New creates a new IPNI publisher.
+// Thread-safety of the publisher will depend on the underlying store. If you will be calling Publish from different
+// goroutines (which is likely), make sure to use a thread-safe store when creating the publisher. A simple way of
+// getting one is using the `github.com/ipfs/go-datastore/sync` package, which offers `sync.MutexDatastore` that wraps
+// any given datastore with a RWMutex.
 func New(id crypto.PrivKey, store store.PublisherStore, opts ...Option) (*IPNIPublisher, error) {
 	o := &options{
 		topic: "/indexer/ingest/mainnet",
