@@ -22,6 +22,7 @@ import (
 	"github.com/ipni/go-libipni/ingest/schema"
 	"github.com/ipni/go-libipni/metadata"
 	"github.com/libp2p/go-libp2p/core/peer"
+	"github.com/multiformats/go-multibase"
 	"github.com/multiformats/go-multihash"
 	"github.com/storacha/go-ucanto/core/ipld/block"
 	"github.com/storacha/go-ucanto/core/ipld/codec/json"
@@ -397,7 +398,8 @@ func IsNotFound(err error) bool {
 }
 
 func providerContextKey(provider peer.ID, contextID []byte) datastore.Key {
-	return datastore.NewKey(provider.String() + "/" + string(contextID))
+	contextKey, _ := multibase.Encode(multibase.Base58BTC, contextID)
+	return datastore.NewKey(provider.String() + "/" + contextKey)
 }
 
 type dsProviderContextTable struct {
