@@ -58,7 +58,7 @@ var MaxEntryChunkSize = 16384
 
 type Store interface {
 	Get(ctx context.Context, key string) (io.ReadCloser, error)
-	Put(ctx context.Context, key string, data io.Reader) error
+	Put(ctx context.Context, key string, len uint64, data io.Reader) error
 }
 
 type ProviderContextTable interface {
@@ -325,7 +325,7 @@ func PutHead(ctx context.Context, ds Store, newHead *head.SignedHead) (datamodel
 	if err != nil {
 		return nil, err
 	}
-	err = ds.Put(ctx, headKey, bytes.NewReader(blk.Bytes()))
+	err = ds.Put(ctx, headKey, uint64(len(blk.Bytes())), bytes.NewReader(blk.Bytes()))
 	if err != nil {
 		return nil, err
 	}
@@ -373,7 +373,7 @@ func store(ctx context.Context, ds Store, value any, typ ipldschema.Type) (ipld.
 	if err != nil {
 		return nil, err
 	}
-	err = ds.Put(ctx, blk.Link().String(), bytes.NewReader(blk.Bytes()))
+	err = ds.Put(ctx, blk.Link().String(), uint64(len(blk.Bytes())), bytes.NewReader(blk.Bytes()))
 	if err != nil {
 		return nil, err
 	}
@@ -432,7 +432,7 @@ func (d *dsStoreAdapter) Get(ctx context.Context, key string) (io.ReadCloser, er
 }
 
 // Put implements Store.
-func (d *dsStoreAdapter) Put(ctx context.Context, key string, r io.Reader) error {
+func (d *dsStoreAdapter) Put(ctx context.Context, key string, len uint64, r io.Reader) error {
 	data, err := io.ReadAll(r)
 	if err != nil {
 		return err
@@ -457,7 +457,7 @@ func (d *directoryStore) Get(ctx context.Context, key string) (io.ReadCloser, er
 }
 
 // Put implements Store.
-func (d *directoryStore) Put(ctx context.Context, key string, data io.Reader) error {
+func (d *directoryStore) Put(ctx context.Context, key string, len uint64, data io.Reader) error {
 	path, err := filepath.Abs(filepath.Join(d.directory, key))
 	if err != nil {
 		return err
