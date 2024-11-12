@@ -7,6 +7,7 @@ import (
 
 	"github.com/ipfs/go-datastore"
 	"github.com/ipfs/go-datastore/namespace"
+	dssync "github.com/ipfs/go-datastore/sync"
 	"github.com/ipld/go-ipld-prime"
 	"github.com/libp2p/go-libp2p/core/crypto"
 	"github.com/storacha/ipni-publisher/pkg/notifier"
@@ -22,8 +23,8 @@ var notifierNamespace = ipniNamespace.ChildString("notifier/")
 func TestExample(t *testing.T) {
 	priv, _, _ := crypto.GenerateEd25519Key(nil)
 
-	// Setup publisher
-	ds := datastore.NewMapDatastore()
+	// Setup a thread-safe publisher using a thread-safe datastore
+	ds := dssync.MutexWrap(datastore.NewMapDatastore())
 	publisherStore := store.FromDatastore(namespace.Wrap(ds, publisherNamespace))
 	publisher, _ := publisher.New(
 		priv,
