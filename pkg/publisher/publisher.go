@@ -50,7 +50,7 @@ func (p *IPNIPublisher) Publish(ctx context.Context, providerInfo peer.AddrInfo,
 var _ Publisher = (*IPNIPublisher)(nil)
 
 // New creates a new IPNI publisher.
-// IPNIPublisher is not safe for concurrent use. There is the risk of loosing advertisements if Publish is called
+// IPNIPublisher is not safe for concurrent use. There is the risk of losing advertisements if Publish is called
 // from concurrent goroutines. If you will be publishing from multiple goroutines concurrently, a synchronization
 // mechanism (such as sync.Mutex) must be used to ensure that Publish is called serially.
 func New(id crypto.PrivKey, store store.PublisherStore, opts ...Option) (*IPNIPublisher, error) {
