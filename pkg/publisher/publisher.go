@@ -36,6 +36,9 @@ type IPNIPublisher struct {
 	store  store.PublisherStore
 }
 
+// Publish creates a new advertisement from the latest head, signs it, and publishes it.
+// Publish is not safe for concurrent use and advertisements may be lost if called concurrently. A mutex or any other
+// synchronization mechanism must be used around Publish if it will be called from concurrent goroutines.
 func (p *IPNIPublisher) Publish(ctx context.Context, providerInfo peer.AddrInfo, contextID string, digests iter.Seq[mh.Multihash], meta metadata.Metadata) (ipld.Link, error) {
 	link, err := p.publishAdvForIndex(ctx, providerInfo.ID, providerInfo.Addrs, []byte(contextID), meta, false, digests)
 	if err != nil {
@@ -46,6 +49,10 @@ func (p *IPNIPublisher) Publish(ctx context.Context, providerInfo peer.AddrInfo,
 
 var _ Publisher = (*IPNIPublisher)(nil)
 
+// New creates a new IPNI publisher.
+// IPNIPublisher is not safe for concurrent use. There is the risk of losing advertisements if Publish is called
+// from concurrent goroutines. If you will be publishing from multiple goroutines concurrently, a synchronization
+// mechanism (such as sync.Mutex) must be used to ensure that Publish is called serially.
 func New(id crypto.PrivKey, store store.PublisherStore, opts ...Option) (*IPNIPublisher, error) {
 	o := &options{
 		topic: "/indexer/ingest/mainnet",
