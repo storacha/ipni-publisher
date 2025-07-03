@@ -135,7 +135,7 @@ func NewNotifierWithStorage(addr string, id crypto.PrivKey, store store.Store) (
 	}
 	headState, err := NewHeadState(store, addrURL.Hostname())
 	if err != nil {
-		return nil, fmt.Errorf("error setting up notification tracking")
+		return nil, fmt.Errorf("error setting up notification tracking: %w", err)
 	}
 	return NewRemoteSyncNotifier(addr, id, headState)
 }
